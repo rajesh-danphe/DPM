@@ -9,7 +9,7 @@ from sklearn.cluster import KMeans
 import json
 import os
 from os import path
-@csrf_protect
+# @csrf_protect
 def centroids(request):
 
 	if request.method == 'POST':
@@ -47,7 +47,7 @@ def centroids(request):
 		json_data.append(data)
 		return JsonResponse(json_data, safe=False)
 
-@csrf_protect
+# @csrf_protect
 def predicted(request):
 	if request.method == 'POST':
 		n_clusters = request.GET['n_clusters']

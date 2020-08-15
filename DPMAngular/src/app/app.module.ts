@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import {LoginComponent} from './Login/login.component'
 import {AppRoutingModule} from './app.routing'
 import {HttpClientModule,HttpClientXsrfModule} from '@angular/common/http'
+import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -16,9 +17,9 @@ import {HttpClientModule,HttpClientXsrfModule} from '@angular/common/http'
     BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
-    HttpClientXsrfModule.withOptions({cookieName: 'csrftoken', headerName: 'X-CSRFToken'})
+    
   ],
-  providers: [],
+  providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
