@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from DPMAPI import views
+from DPM.DPMAPI import views
 
 urlpatterns = [
     url('', views.centroids),
