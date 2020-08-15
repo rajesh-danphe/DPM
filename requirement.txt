@@ -1,0 +1,6 @@
+django==3.0.9
+djangorestframework==3.11.0
+numpy==1.19.1
+pandas==1.1.0
+scikit-learn==0.23.1
+scipy==1.5.2

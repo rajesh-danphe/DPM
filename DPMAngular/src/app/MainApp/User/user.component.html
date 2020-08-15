@@ -1,0 +1,79 @@
+<style>
+
+</style>
+<div *ngIf="Loading" class="col-md-12" align="center" style="position: absolute;
+top: 10em;
+z-index: 10000;">
+    <div class="dot-pulse">
+
+    </div>
+</div>
+<div>
+
+    <h3><span style="color: red;font-size: 2.5em;">*</span> <span>Test Your Data</span></h3>
+</div>
+<hr>
+<div class="row col-md-12">
+    <!-- <div class="col-md-6">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+            </div>
+            <div class="custom-file">
+                <input type="file" (change)="fileTrainChange($event)" class="custom-file-input" accept=".csv" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                <label class="custom-file-label" for="inputGroupFile01">Choose Train File</label>
+            </div>
+        </div>
+    </div> -->
+    <div class="col-md-6">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+            </div>
+            <div class="custom-file">
+                <input type="file" (change)="fileTestChange($event)" class="custom-file-input" accept=".csv" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                <label class="custom-file-label" for="inputGroupFile01">Choose Test File</label>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1">
+        <button type="submit" class="btn btn-success" (click)="Submit()">Submit</button>
+    </div>
+</div>
+
+<div class="col-md-12" align="center" *ngIf="PredicatedData.length>0">
+    <h2>BELOW IS YOUR PREDICTED DATA</h2>
+</div>
+
+<div class="col-md-12" *ngIf="PredicatedData.length>0">
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <th *ngFor="let col of PredicatedColumns">{{col}}</th>
+        </thead>
+        <tbody>
+
+            <tr *ngFor="let colObj of PredicatedData">
+                <td *ngFor="let col of PredicatedColumns"> {{colObj[col]}}</td>
+            </tr>
+
+        </tbody>
+        <tfoot class="tbl_pagination">
+            <tr>
+                <td colspan="10">
+                    <div class="pagi_cls" align="center">
+                        <ul>
+                            <li> Items per page:
+                                <select (change)="SelectItemPer($event.target.value)" [(ngModel)]="itemPerPageSelected">
+                          <option *ngFor="let row of perPages" value="{{row.pageSize}}">{{row.pageSize}}</option>
+                        </select>
+                            </li>
+                            <li> <span> showing {{currentPage + 1}}&nbsp;-&nbsp;{{endPage}} &nbsp;of&nbsp;{{totalRecordSize}}</span> &nbsp;&nbsp;</li>
+                            <li><i [ngClass]="{disabled:currentPage===0}" (click)="previous()" class="fa fa-angle-left">Previous</i> &nbsp;&nbsp;
+                                <i [ngClass]="{disabled:totalRecordSize<=endPage}" (click)="next()" class="fa fa-angle-right">Next</i></li>
+                        </ul>
+                    </div>
+                </td>
+        </tfoot>
+    </table>
+
+</div>
