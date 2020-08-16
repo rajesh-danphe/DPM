@@ -138,4 +138,4 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'DPMAPI\static'),
 )
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
