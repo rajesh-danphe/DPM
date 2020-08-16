@@ -60,7 +60,7 @@ def predicted(request):
     iterate = request.GET['iterate']
     tolerance = request.GET['tolerance']
     random_state = request.GET['random_state']
-    trainFile = os.path.join(BASE_DIR, 'DPMAPI\\static\\Files\\U1TrainFile.csv')
+    trainFile = os.path.join(BASE_DIR, 'DPMAP/static/Files/U1TrainFile.csv')
     testFile = request.FILES['testFile']
     trainData = pd.read_csv(trainFile).replace(np.nan, 0)
     kmeans = KMeans(n_clusters=int(n_clusters), init='random', max_iter=int(iterate), tol=float(tolerance),
