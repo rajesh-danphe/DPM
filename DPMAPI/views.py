@@ -12,7 +12,7 @@ import os
 from os import path
 from whitenoise import WhiteNoise
 from django.core.wsgi import get_wsgi_application
-
+from django.conf import settings as djangoSettings
 # @csrf_protect
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -25,10 +25,10 @@ def centroids(request):
     random_state = request.GET['random_state']
     file = request.FILES['uploadFile']
     data = pd.read_csv(file).replace(np.nan, 0)
-    application = get_wsgi_application()
-    application = WhiteNoise(application, root='DPMAPI/static')
+    # application = get_wsgi_application()
+    # application = WhiteNoise(application, root='DPMAPI/static')
     dirName = 'DPMAPI/static/Files'
-    application.add_files('DPMAPI/static', prefix='Files/')
+    # application.add_files('DPMAPI/static', prefix='Files/')
     if (path.exists(dirName)):
       isPresent = path.exists(os.path.join(dirName, "U1TrainFile.csv"))
       if (isPresent):
@@ -66,9 +66,9 @@ def predicted(request):
     iterate = request.GET['iterate']
     tolerance = request.GET['tolerance']
     random_state = request.GET['random_state']
-    trainFile ='DPMAP/static/Files/U1TrainFile.csv'
+    file = os.path.join(djangoSettings.STATIC_FILES, "U1TrainFile.csv")
     testFile = request.FILES['testFile']
-    trainData = pd.read_csv(trainFile).replace(np.nan, 0)
+    trainData = pd.read_csv(file).replace(np.nan, 0)
     kmeans = KMeans(n_clusters=int(n_clusters), init='random', max_iter=int(iterate), tol=float(tolerance),
                     random_state=int(random_state)).fit(trainData)
     testdata = pd.read_csv(testFile).replace(np.nan, 0)
