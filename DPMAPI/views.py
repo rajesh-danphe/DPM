@@ -19,7 +19,7 @@ def centroids(request):
 		random_state = request.GET['random_state']
 		file = request.FILES['uploadFile']
 		data = pd.read_csv(file).replace(np.nan, 0)
-		dirName = 'Files'
+		dirName = 'DPMAPI/static/Files'
 		if (path.exists(dirName)):
 			isPresent = path.exists(os.path.join(dirName, "U1TrainFile.csv"))
 			if (isPresent):
