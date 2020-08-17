@@ -1,6 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 
-@import './assets/bootstrap.css';
+@import './assets/css/bootstrap.css';
+@import './assets/css/main.css';
+@import './assets/css/util.css';
 
 /*Custom Title*/
 
