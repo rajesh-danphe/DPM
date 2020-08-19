@@ -1,14 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { HttpClient, HttpHeaderResponse, HttpHeaders } from '@angular/common/http';
-
+import { HttpClient } from '@angular/common/http';
+import * as xlsx from 'xlsx'
+import * as moment from 'moment';
 @Component({
     templateUrl: './admin.component.html'
 })
 export class AdminComponent {
 
     public centroids: any = [];
-    public columns: any = ['Pd1', 'Pd2', 'Td1Td2'];
+    public columns: any = [];
     public nCluster: number = 0;
     public maxIterate: number = 0;
     public tolerance: number = 0;
@@ -21,11 +22,12 @@ export class AdminComponent {
     public totalRecordSize: number = 0;
     public itemPerPage: number = 0;
     public itemPerPageSelected: string = "";
-    public perPages: any = [{pageSize:5},{pageSize:10},{pageSize:15}];
+    public perPages: any = [{ pageSize: 5 }, { pageSize: 10 }, { pageSize: 15 }];
     public totalRecord: any = [];
     public CentroidColumns: any = [];
     constructor(public title: Title,
-        public http: HttpClient) {
+        public http: HttpClient,
+        public changeDetectorRef:ChangeDetectorRef) {
         this.title.setTitle("Admin | Dynamic Preventative Maintenance")
         this.itemPerPageSelected = this.perPages[0].pageSize;
     }
@@ -35,7 +37,7 @@ export class AdminComponent {
         if (fileList.length > 0) {
             this.file = fileList[0];
             this.fileName = this.file.name;
-           // this.Submit();
+            // this.Submit();
         }
     }
 
@@ -43,7 +45,7 @@ export class AdminComponent {
         if (this.file != undefined && this.nCluster != 0 && this.maxIterate != 0) {
             let formData = new FormData();
             formData.append('uploadFile', this.file);
-            console.log(this.file);       
+            console.log(this.file);
             let obj = new Object();
             obj['lastModified'] = this.file.lastModified;
             obj['name'] = this.file.name;
@@ -51,21 +53,16 @@ export class AdminComponent {
             obj['type'] = this.file.type;
 
             localStorage.setItem("train_file", JSON.stringify(obj));
-            localStorage.setItem("nCluster",this.nCluster.toString());
-            localStorage.setItem("maxIterate",this.maxIterate.toString());
-            localStorage.setItem("tolerance",this.tolerance.toString());
-            localStorage.setItem("randomState",this.randomState.toString());
+            localStorage.setItem("nCluster", this.nCluster.toString());
+            localStorage.setItem("maxIterate", this.maxIterate.toString());
+            localStorage.setItem("tolerance", this.tolerance.toString());
+            localStorage.setItem("randomState", this.randomState.toString());
             this.Loading = true;
             this.http.post('/Centroids?n_clusters=' + this.nCluster + '&iterate=' + this.maxIterate + '&tolerance=' + this.tolerance + '&random_state=' + this.randomState, formData, { responseType: 'json' })
                 .subscribe((res: any) => {
-                    console.log(res);                    
+                    console.log(res);
                     this.CentroidColumns = res[0];
-                    // this.centroids = res[1];
                     this.totalRecord = res[1];
-                    this.endPage = parseInt(this.itemPerPageSelected);
-                    this.totalRecordSize = this.totalRecord.length;
-                    this.centroids = this.totalRecord.slice(0, this.endPage);
-                    this.SelectItemPer(this.itemPerPageSelected);
                     this.Loading = false;
                 }, err => {
                     alert(err);
@@ -74,24 +71,39 @@ export class AdminComponent {
             alert("Kindly Select Cluster, Iterate and File");
         }
     }
-
-    SelectItemPer(value) {
-        this.currentPage = 0;
-        this.endPage = parseInt(value);
-        this.centroids = this.totalRecord.slice(this.currentPage, this.endPage)
+    AdminSelectRecords(event) {
+        this.centroids = event;
+        this.changeDetectorRef.detectChanges();
     }
-    next() {
-        this.currentPage = this.endPage;
-        this.endPage += parseInt(this.itemPerPageSelected);
-        let records = this.totalRecord.slice(this.currentPage, this.endPage);
-        this.centroids = records
-    }
+    exportCSV() {
+        if (this.centroids.length > 0) {
+            var content = '';
+            content +=
+                '<tr>'
+            this.CentroidColumns.forEach(header => {
+                content += '<th>' + header + '</th>'
+            });
+            content += '</tr>';
+            this.totalRecord.forEach(data => {
+                content += '<tr>'
+                this.CentroidColumns.forEach(col => {
+                    content += '<td>' + data[col] + '</td>'
+                });
+                content += '</tr>'
+            });
 
-    previous() {
-        this.currentPage -= parseInt(this.itemPerPageSelected);
-        this.endPage -= parseInt(this.itemPerPageSelected);
-        let records = this.totalRecord.slice(this.currentPage, this.endPage);
-        this.centroids = records
+            var s = document.createElement("table");
+            s.innerHTML = content;
+
+            const ws: xlsx.WorkSheet = xlsx.utils.table_to_sheet(s);
+            const wb: xlsx.WorkBook = xlsx.utils.book_new();
+
+            xlsx.utils.book_append_sheet(wb, ws, 'Train_Data');
+            xlsx.writeFile(wb, 'Train_Data' + moment().format('DD-MMM-YYYY') + '.csv');
+
+        } else {
+            alert("you haven't selected the train file.")
+        }
     }
 
 }

@@ -138,10 +138,11 @@ tfoot.tbl_pagination tr td {
 tfoot.tbl_pagination tr td .fa {
     background: #999;
     color: #fff;
-    padding: 0.4em;
     width: 25px;
     height: 25px;
     font-style: initial;
+    font-size: 1.5em;
+    font-weight: bold;
     text-align: center;
     line-height: 25px;
     border-radius: 0.3em;

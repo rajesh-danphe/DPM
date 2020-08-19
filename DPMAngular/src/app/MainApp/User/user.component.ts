@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
-
+import * as xlsx from 'xlsx';
+import * as moment from 'moment';
 @Component({
     templateUrl: './user.component.html'
 })
@@ -20,10 +21,11 @@ export class UserComponent {
     public totalRecordSize: number = 0;
     public itemPerPage: number = 0;
     public itemPerPageSelected: string = "";
-    public perPages: any = [{pageSize:5},{pageSize:10},{pageSize:15}];
+    public perPages: any = [{ pageSize: 5 }, { pageSize: 10 }, { pageSize: 15 }];
     public totalRecord: any = [];
     public PredicatedColumns: any = [];
-    constructor(public title: Title, public http: HttpClient) {
+    constructor(public title: Title, public http: HttpClient,
+        public changeDetectorRef: ChangeDetectorRef) {
         this.title.setTitle("User | Dynamic Preventative Maintenance");
 
         this.trainFile = JSON.parse(localStorage.getItem("train_file"));
@@ -33,7 +35,7 @@ export class UserComponent {
         this.tolerance = localStorage.getItem("tolerance");
         this.randomState = localStorage.getItem("randomState");
         this.itemPerPageSelected = this.perPages[0].pageSize;
-       
+
     }
     fileTrainChange(event) {
         let fileList: FileList = event.target.files;
@@ -48,7 +50,7 @@ export class UserComponent {
         if (fileList.length > 0) {
             this.testFile = fileList[0];
             this.fileName = this.testFile.name;
-           // this.Submit();
+            // this.Submit();
         }
     }
     Submit() {
@@ -64,10 +66,6 @@ export class UserComponent {
                     console.log(res);
                     this.PredicatedColumns = res[0];
                     this.totalRecord = res[1];
-                    this.endPage = parseInt(this.itemPerPageSelected);
-                    this.totalRecordSize = this.totalRecord.length;
-                    this.PredicatedData = this.totalRecord.slice(0, this.endPage);
-                    this.SelectItemPer(this.itemPerPageSelected);
                     this.Loading = false;
                 }, err => {
                     alert(err);
@@ -77,23 +75,41 @@ export class UserComponent {
         }
     }
 
-    SelectItemPer(value) {
-        this.currentPage = 0;
-        this.endPage = parseInt(value);
-        this.PredicatedData = this.totalRecord.slice(this.currentPage, this.endPage)
-    }
-    next() {
-        this.currentPage = this.endPage;
-        this.endPage += parseInt(this.itemPerPageSelected);
-        let records = this.totalRecord.slice(this.currentPage, this.endPage);
-        this.PredicatedData = records
+    UserSelectedRecords(event) {
+        this.PredicatedData = event;
+        this.changeDetectorRef.detectChanges();
     }
 
-    previous() {
-        this.currentPage -= parseInt(this.itemPerPageSelected);
-        this.endPage -= parseInt(this.itemPerPageSelected);
-        let records = this.totalRecord.slice(this.currentPage, this.endPage);
-        this.PredicatedData = records
+
+    exportCSV() {
+        if (this.totalRecord.length > 0) {
+            var content = '';
+            content +=
+                '<tr>'
+            this.PredicatedColumns.forEach(header => {
+                content += '<th>' + header + '</th>'
+            });
+            content += '</tr>';
+            this.totalRecord.forEach(data => {
+                content += '<tr>'
+                this.PredicatedColumns.forEach(col => {
+                    content += '<td>' + data[col] + '</td>'
+                });
+                content += '</tr>'
+            });
+
+            var s = document.createElement("table");
+            s.innerHTML = content;
+
+            const ws: xlsx.WorkSheet = xlsx.utils.table_to_sheet(s);
+            const wb: xlsx.WorkBook = xlsx.utils.book_new();
+
+            xlsx.utils.book_append_sheet(wb, ws, 'Train_Data');
+            xlsx.writeFile(wb, 'Predicted_Data' + moment().format('DD-MMM-YYYY') + '.csv');
+
+        } else {
+            alert("you haven't selected the test file.")
+        }
     }
 
 }

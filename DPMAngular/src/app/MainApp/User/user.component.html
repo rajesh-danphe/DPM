@@ -1,16 +1,17 @@
-<style>
-
-</style>
-<div *ngIf="Loading" class="col-md-12" align="center" style="position: absolute;
-top: 10em;
-z-index: 10000;">
+<div *ngIf="Loading" class="col-md-12" align="center" style="position: absolute;top: 10em;z-index: 10000;">
     <div class="dot-pulse">
 
     </div>
 </div>
-<div>
-
-    <h3><span style="color: red;font-size: 2.5em;">*</span> <span>Test Your Data</span></h3>
+<div class="row">
+    <div class="col-md-12">
+        <div style="float: left;">
+            <h3><span style="color: red;font-size: 2.5em;">*</span> <span>Test Your Data</span></h3>
+        </div>
+        <div style="float: right;">
+            <button class="bttn-custom" title="Export CSV" (click)="exportCSV()" style="font-size: 3em;color: green;"><i class="fa fa-file-excel-o"></i></button>
+        </div>
+    </div>
 </div>
 <hr>
 <div class="row col-md-12">
@@ -41,11 +42,11 @@ z-index: 10000;">
     </div>
 </div>
 
-<div class="col-md-12" align="center" *ngIf="PredicatedData.length>0">
+<div class="col-md-12" align="center" *ngIf="totalRecord.length>0">
     <h2>BELOW IS YOUR PREDICTED DATA</h2>
 </div>
 
-<div class="col-md-12" *ngIf="PredicatedData.length>0">
+<div class="col-md-12" *ngIf="totalRecord.length>0">
     <table class="table table-striped">
         <thead class="thead-dark">
             <th *ngFor="let col of PredicatedColumns">{{col}}</th>
@@ -60,18 +61,7 @@ z-index: 10000;">
         <tfoot class="tbl_pagination">
             <tr>
                 <td colspan="10">
-                    <div class="pagi_cls" align="center">
-                        <ul>
-                            <li> Items per page:
-                                <select (change)="SelectItemPer($event.target.value)" [(ngModel)]="itemPerPageSelected">
-                          <option *ngFor="let row of perPages" value="{{row.pageSize}}">{{row.pageSize}}</option>
-                        </select>
-                            </li>
-                            <li> <span> showing {{currentPage + 1}}&nbsp;-&nbsp;{{endPage}} &nbsp;of&nbsp;{{totalRecordSize}}</span> &nbsp;&nbsp;</li>
-                            <li><i [ngClass]="{disabled:currentPage===0}" (click)="previous()" class="fa fa-angle-left">Previous</i> &nbsp;&nbsp;
-                                <i [ngClass]="{disabled:totalRecordSize<=endPage}" (click)="next()" class="fa fa-angle-right">Next</i></li>
-                        </ul>
-                    </div>
+                    <pagination [perPages]="[{pageSize:5},{pageSize:10},{pageSize:15}]" [totalRecord]="totalRecord" [align]="'right'" (selectedRecord)="UserSelectedRecords($event)"></pagination>
                 </td>
         </tfoot>
     </table>
